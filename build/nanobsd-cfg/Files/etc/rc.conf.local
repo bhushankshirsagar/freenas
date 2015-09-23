@@ -177,12 +177,12 @@ _interface_config()
 			carp1_skew="20"
 			carp2_skew="80"
 			internal_ip="169.254.10.1"
-			/sbin/sysctl kern.cam.ctl.ha_peer="listen 169.254.10.1"
+			/sbin/sysctl kern.cam.ctl.ha_peer="listen 169.254.10.1" >/dev/null
 		elif [ ${node} = "B" ]; then
 			carp1_skew="80"
 			carp2_skew="20"
 			internal_ip="169.254.10.2"
-			/sbin/sysctl kern.cam.ctl.ha_peer="connect 169.254.10.1"
+			/sbin/sysctl kern.cam.ctl.ha_peer="connect 169.254.10.1" >/dev/null
 		else
 			echo "# Could not determine system node"
 		fi
@@ -511,8 +511,10 @@ _gen_conf()
 	_count_config powerd_enable system_advanced adv_powerdaemon =1
 	_count_config ix_diagnose_enable system_advanced adv_uploadcrash =1
 	if ! is_freenas; then
-		_count_config pf_enable system_failover id \>0
-		_count_config failover_enable system_failover id \>0
+		if [ "$(/usr/local/bin/python /usr/local/www/freenasUI/middleware/notifier.py failover_licensed 2> /dev/null)" = "True" ]; then
+			echo "failover_enable=\"YES\""
+			echo "pf_enable=\"YES\""
+		fi
 		local failover="$(/usr/local/bin/python /usr/local/www/freenasUI/middleware/notifier.py failover_status 2> /dev/null)"
 		if [ "${failover}" != "BACKUP" ]; then
 			echo "collectd_enable=\"YES\""
