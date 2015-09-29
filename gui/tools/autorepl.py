@@ -100,7 +100,7 @@ def rcro():
 #
 # Attempt to send a snapshot or increamental stream to remote.
 #
-def sendzfs(fromsnap, tosnap, dataset, localfs, remotefs, throttle, replication):
+def sendzfs(fromsnap, tosnap, dataset, localfs, remotefs, throttle, replication, reached_last):
     global results
     global templog
 
@@ -146,6 +146,9 @@ def sendzfs(fromsnap, tosnap, dataset, localfs, remotefs, throttle, replication)
     msg = msg.replace('WARNING: enabled NONE cipher\n', '')
     log.debug("Replication result: %s" % (msg))
     results[replication.id] = msg
+    if reached_last and msg == "Succeeded":
+        replication.repl_lastsnapshot = tosnap
+        replication.save()
     return (msg == "Succeeded")
 
 log = logging.getLogger('tools.autorepl')
@@ -344,7 +347,7 @@ Hello,
     else:
         rzfscmd = '"zfs list -H -t snapshot -p -o name,creation -d 1 -r \'%s\'"' % (remotefs_final)
     sshproc = pipeopen('%s %s' % (sshcmd, rzfscmd))
-    output = sshproc.communicate()[0]
+    output, error = sshproc.communicate()
     if output != '':
         snaplist = output.split('\n')
         snaplist = [x for x in snaplist if not system_re.match(x) and x != '']
@@ -352,6 +355,9 @@ Hello,
         l = len(remotefs_final)
         snaplist = [ localfs + x[l:] for x in snaplist ]
         map_target = mapfromdata(snaplist)
+    elif error != '':
+        results[replication.id] = 'Failed: %s' % (error)
+        continue
     else:
         map_target = {}
 
@@ -415,8 +421,15 @@ Hello,
 
     previously_deleted = "/"
     l = len(localfs)
+    total_datasets = len(tasks.keys())
+    if total_datasets == 0:
+        results[replication.id] = 'Up to date'
+        continue
+    current_dataset = 0
     for dataset in sorted(tasks.keys()):
         tasklist = tasks[dataset]
+        current_dataset += 1
+        reached_last = (current_dataset == total_datasets)
         if tasklist[0] == None:
             # No matching snapshot(s) exist.  If there is any snapshots on the
             # target side, destroy all existing snapshots so we can proceed.
@@ -445,10 +458,10 @@ Hello,
                     results[replication.id] = 'Unable to destroy remote snapshot: %s' % (failed_snapshots)
                     ### rzfs destroy %s
             psnap = tasklist[1]
-            success = sendzfs(None, psnap, dataset, localfs, remotefs, throttle, replication)
+            success = sendzfs(None, psnap, dataset, localfs, remotefs, throttle, replication, reached_last)
             if success:
                 for nsnap in tasklist[2:]:
-                    success = sendzfs(psnap, nsnap, dataset, localfs, remotefs, throttle, replication)
+                    success = sendzfs(psnap, nsnap, dataset, localfs, remotefs, throttle, replication, reached_last)
                     if not success:
                         # Report the situation
                         error, errmsg = send_mail(
@@ -476,7 +489,7 @@ Hello,
             psnap = tasklist[0]
             allsucceeded = True
             for nsnap in tasklist[1:]:
-                success = sendzfs(psnap, nsnap, dataset, localfs, remotefs, throttle, replication)
+                success = sendzfs(psnap, nsnap, dataset, localfs, remotefs, throttle, replication, reached_last)
                 allsucceeded = allsucceeded and success
                 if not success:
                     # Report the situation
