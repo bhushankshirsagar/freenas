@@ -173,7 +173,7 @@ class AlertResource(DojoResource):
                     continue
 
                 lte = request.GET.get('timestamp__lte')
-                if lte and int(lte) < res.getTimestamp():
+                if lte and int(lte) > res.getTimestamp():
                     results.remove(res)
                     continue
 
@@ -2046,7 +2046,7 @@ class SnapshotResource(DojoResource):
                     repli[repl] = snaps
                     break
             if found is False:
-                repli[repl] = notifier().repl_remote_snapshots(repl)
+                repli[repl] = set(notifier().repl_remote_snapshots(repl))
 
         snapshots = notifier().zfs_snapshot_list(replications=repli)
 
