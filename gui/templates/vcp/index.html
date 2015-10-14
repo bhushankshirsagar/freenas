@@ -59,18 +59,7 @@
              
                 </script>
         </button>
-	<button id="btn_vcenterconfiguration_Repair" data-dojo-type="dijit.form.Button">Repair
-            <script type="dojo/method" data-dojo-event="onClick" data-dojo-args="e">
-               
-              form = getForm(this);
-                doSubmit({
-                    form: form,
-                    event: e,
-                    url: '{% url "vcp_repair" %}',
-                    });               
-             
-                </script>
-        </button>
+ 
 
     {% endblock %}       
          
@@ -82,14 +71,12 @@
        {% if  form.vcp_is_installed %}
        <script type="dojo/method">
           document.getElementById("btn_vcenterconfiguration_Ok").disabled = true;
-          document.getElementById("btn_vcenterconfiguration_Cancel").disabled = false;
-          document.getElementById("btn_vcenterconfiguration_Repair").disabled = false;      
+          document.getElementById("btn_vcenterconfiguration_Cancel").disabled = false;      
        </script>
         {% else %}
        <script type="dojo/method">           
           document.getElementById("btn_vcenterconfiguration_Ok").disabled = false;      
           document.getElementById("btn_vcenterconfiguration_Cancel").disabled = true;
-          document.getElementById("btn_vcenterconfiguration_Repair").disabled = true;
        </script>
        {% endif %}       
        {% if 'Not available' in form.vcp_available_version%}
