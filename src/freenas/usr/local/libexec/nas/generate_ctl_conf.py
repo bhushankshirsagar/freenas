@@ -134,11 +134,14 @@ def main():
     for portal in iSCSITargetPortal.objects.all():
         # Prepare auth group for the portal group
         if portal.iscsi_target_portal_discoveryauthgroup:
-            auth_list = iSCSITargetAuthCredential.objects.filter(iscsi_target_auth_tag=portal.iscsi_target_portal_discoveryauthgroup)
+            auth_list = iSCSITargetAuthCredential.objects.filter(
+                iscsi_target_auth_tag=portal.iscsi_target_portal_discoveryauthgroup)
         else:
             auth_list = []
         agname = '4pg%d' % portal.iscsi_target_portal_tag
-        auth = auth_group_config(auth_tag=agname, auth_list=auth_list, auth_type=portal.iscsi_target_portal_discoveryauthmethod)
+        auth = auth_group_config(auth_tag=agname,
+                                 auth_list=auth_list,
+                                 auth_type=portal.iscsi_target_portal_discoveryauthmethod)
 
         addline("portal-group pg%s {\n" % portal.iscsi_target_portal_tag)
         addline("\tdiscovery-filter portal-name\n")
@@ -187,13 +190,15 @@ def main():
                     zvolname = path.split('/', 1)[1]
                     zfslist = zfs.zfs_list(path=zvolname, types=['volume'])
                     if zfslist:
-                        lunthreshold = int(zfslist[zvolname].volsize * (extent.iscsi_target_extent_avail_threshold / 100.0))
+                        lunthreshold = int(zfslist[zvolname].volsize *
+                                           (extent.iscsi_target_extent_avail_threshold / 100.0))
                 path = "/dev/" + path
             else:
                 if extent.iscsi_target_extent_avail_threshold and os.path.exists(path):
                     try:
                         stat = os.stat(path)
-                        lunthreshold = int(stat.st_size * (extent.iscsi_target_extent_avail_threshold / 100.0))
+                        lunthreshold = int(stat.st_size *
+                                           (extent.iscsi_target_extent_avail_threshold / 100.0))
                     except OSError:
                         pass
         addline("lun \"%s\" {\n" % extent.iscsi_target_extent_name)
@@ -212,13 +217,7 @@ def main():
             if size.endswith('B'):
                 size = size.strip('B')
             addline("\t\tsize %s\n" % size)
-        fh = open("/etc/version", "r")
-        version = fh.read()
-        fh.close()
-        if version.lower().startswith("truenas"):
-            addline('\toption vendor "TrueNAS"\n')
-        else:
-            addline('\toption vendor "FreeNAS"\n')
+        addline('\toption vendor "FreeBSD"\n')
         addline('\toption product "iSCSI Disk"\n')
         addline('\toption revision "0123"\n')
         addline('\toption naa %s\n' % extent.iscsi_target_extent_naa)
@@ -244,11 +243,15 @@ def main():
         authgroups = {}
         for grp in target.iscsitargetgroups_set.all():
             if grp.iscsi_target_authgroup:
-                auth_list = iSCSITargetAuthCredential.objects.filter(iscsi_target_auth_tag=grp.iscsi_target_authgroup)
+                auth_list = iSCSITargetAuthCredential.objects.filter(
+                    iscsi_target_auth_tag=grp.iscsi_target_authgroup)
             else:
                 auth_list = []
             agname = '4tg%d_%d' % (target.id, grp.id)
-            if auth_group_config(auth_tag=agname, auth_list=auth_list, auth_type=grp.iscsi_target_authtype, initiator=grp.iscsi_target_initiatorgroup):
+            if auth_group_config(auth_tag=agname,
+                                 auth_list=auth_list,
+                                 auth_type=grp.iscsi_target_authtype,
+                                 initiator=grp.iscsi_target_initiatorgroup):
                 authgroups[grp.id] = agname
         if (target.iscsi_target_name.startswith("iqn.") or
                 target.iscsi_target_name.startswith("eui.") or
@@ -285,10 +288,12 @@ def main():
             if t2e.iscsi_lunid is None:
                 while cur_lunid in used_lunids:
                     cur_lunid += 1
-                addline("\tlun %s \"%s\"\n" % (cur_lunid, t2e.iscsi_extent.iscsi_target_extent_name))
+                addline("\tlun %s \"%s\"\n" % (cur_lunid,
+                                               t2e.iscsi_extent.iscsi_target_extent_name))
                 cur_lunid += 1
             else:
-                addline("\tlun %s \"%s\"\n" % (t2e.iscsi_lunid, t2e.iscsi_extent.iscsi_target_extent_name))
+                addline("\tlun %s \"%s\"\n" % (t2e.iscsi_lunid,
+                                               t2e.iscsi_extent.iscsi_target_extent_name))
         addline("}\n\n")
 
     os.umask(077)
