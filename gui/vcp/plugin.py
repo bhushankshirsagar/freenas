@@ -26,7 +26,7 @@
 #####################################################################
 
 import requests
-import ssl
+#import ssl
 import datetime
 import utils
 import ConfigParser
@@ -147,10 +147,10 @@ class PluginManager:
             vcp_url,
             thumb_print):
         try:
-            try:
-                ssl._create_default_https_context = ssl._create_unverified_context
-            except AttributeError:
-                print 'Error ssl'
+            # try:
+                # ssl._create_default_https_context = ssl._create_unverified_context
+            # except AttributeError:
+                # print 'Error ssl'
             si = SmartConnect("https", vc_ip, int(port), usernName, password)
             ext = self.get_extension(vcp_url, thumb_print)
             if isinstance(ext, vim.Extension):
@@ -167,10 +167,10 @@ class PluginManager:
 
     def uninstall_vCenter_plugin(self, vc_ip, usernName, password, port):
         try:
-            try:
-                ssl._create_default_https_context = ssl._create_unverified_context
-            except AttributeError:
-                print 'Error ssl'
+            # try:
+                # ssl._create_default_https_context = ssl._create_unverified_context
+            # except AttributeError:
+                # print 'Error ssl'
             si = SmartConnect("https", vc_ip, int(port), usernName, password)
             extkey = self.get_extensionKey()
             si.RetrieveServiceContent().extensionManager.UnregisterExtension(extkey)
@@ -189,10 +189,10 @@ class PluginManager:
             vcp_url,
             thumb_print):
         try:
-            try:
-                ssl._create_default_https_context = ssl._create_unverified_context
-            except AttributeError:
-                print 'Error ssl'
+            # try:
+                # ssl._create_default_https_context = ssl._create_unverified_context
+            # except AttributeError:
+                # print 'Error ssl'
             si = SmartConnect("https", vc_ip, int(port), usernName, password)
             ext = self.get_extension(vcp_url, thumb_print)
             if isinstance(ext, vim.Extension):
@@ -207,10 +207,10 @@ class PluginManager:
 
     def find_plugin(self, vc_ip, usernName, password, port):
         try:
-            try:
-                ssl._create_default_https_context = ssl._create_unverified_context
-            except AttributeError:
-                print 'Error ssl'
+            # try:
+                # ssl._create_default_https_context = ssl._create_unverified_context
+            # except AttributeError:
+                # print 'Error ssl'
             si = SmartConnect("https", vc_ip, int(port), usernName, password)
             extkey = self.get_extensionKey()
             ext = si.RetrieveServiceContent().extensionManager.FindExtension(extkey)
@@ -229,10 +229,10 @@ class PluginManager:
     def check_credential(self, vc_ip, usernName, password, port):
         try:
 
-            try:
-                ssl._create_default_https_context = ssl._create_unverified_context
-            except AttributeError:
-                print 'Error ssl'
+            # try:
+                # ssl._create_default_https_context = ssl._create_unverified_context
+            # except AttributeError:
+                # print 'Error ssl'
             si = SmartConnect("https", vc_ip, int(port), usernName, password)
             if si is None:
                 return False
