@@ -69,7 +69,7 @@ class VcenterConfigurationForm(ModelForm):
             username = str(self.cleaned_data['vc_username'])
             sys_guiprotocol = self.get_sys_protocol()
             if self.get_aux_enable_https() == False and sys_guiprotocol.upper() == 'HTTPS':
-                self.vcp_status = 'Please enable vCenter Plugin over https as True.'
+                self.vcp_status = 'Please enable vCenter Plugin over https.'
                 return False
 
             status_flag = self.validate_vcp_param(
@@ -160,7 +160,7 @@ class VcenterConfigurationForm(ModelForm):
 
             sys_guiprotocol = self.get_sys_protocol()
             if self.get_aux_enable_https() == False and sys_guiprotocol.upper() == 'HTTPS':
-                self.vcp_status = 'Please enable vCenter Plugin over https as True.'
+                self.vcp_status = 'Please enable vCenter Plugin over https.'
                 return False
 
             status_flag = self.validate_vcp_param(
@@ -216,7 +216,7 @@ class VcenterConfigurationForm(ModelForm):
 
             sys_guiprotocol = self.get_sys_protocol()
             if self.get_aux_enable_https() == False and sys_guiprotocol.upper() == 'HTTPS':
-                self.vcp_status = 'Please enable vCenter Plugin over https as True.'
+                self.vcp_status = 'Please first enable vCenter Plugin over https.'
                 return False
 
             status_flag = self.validate_vcp_param(
