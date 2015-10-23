@@ -1,35 +1,59 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
+from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
+from django.db import models
 
 
-class Migration(DataMigration):
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
-        # Adding model 'vcenterauxsettings'
+        # Adding model 'VcenterConfiguration'
         db.create_table(
-            'vcp_vcenterauxsettings',
-            (
-                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-                ('vc_enable_https', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            )
-        )
-        db.send_create_signal('vcp', ['vcenterauxsettings'])
-        vcpaux = orm.vcenterauxsettings()
-        vcpaux.vc_enable_https = False
-        vcpaux.save()
+            u'vcp_vcenterconfiguration', ((u'id', self.gf('django.db.models.fields.AutoField')(
+                primary_key=True)), ('vc_management_ip', self.gf('django.db.models.fields.CharField')(
+                    default='1', max_length=120)), ('vc_ip', self.gf('django.db.models.fields.CharField')(
+                        default='', max_length=120)), ('vc_port', self.gf('django.db.models.fields.CharField')(
+                            default='443', max_length=5)), ('vc_username', self.gf('django.db.models.fields.CharField')(
+                                max_length=120)), ('vc_password', self.gf('django.db.models.fields.CharField')(
+                                    max_length=120)), ('vc_version', self.gf('django.db.models.fields.CharField')(
+                                        max_length=120, null=True, blank=True)), ))
+        db.send_create_signal(u'vcp', ['VcenterConfiguration'])
+
+        # Adding model 'VcenterAuxSettings'
+        db.create_table(
+            u'vcp_vcenterauxsettings',
+            ((u'id',
+              self.gf('django.db.models.fields.AutoField')(
+                  primary_key=True)),
+                ('vc_enable_https',
+                 self.gf('django.db.models.fields.BooleanField')(
+                     default=False)),
+             ))
+        db.send_create_signal(u'vcp', ['VcenterAuxSettings'])
 
     def backwards(self, orm):
+        # Deleting model 'VcenterConfiguration'
+        db.delete_table(u'vcp_vcenterconfiguration')
 
-        # Deleting model 'vcenterauxsettings'
-        db.delete_table('vcp_vcenterauxsettings')
+        # Deleting model 'VcenterAuxSettings'
+        db.delete_table(u'vcp_vcenterauxsettings')
 
     models = {
-        'vcp.vcenterauxsettings': {
+        u'vcp.vcenterauxsettings': {
             'Meta': {'object_name': 'VcenterAuxSettings'},
-            'vc_enable_https': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'vc_enable_https': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        u'vcp.vcenterconfiguration': {
+            'Meta': {'object_name': 'VcenterConfiguration'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'vc_ip': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '120'}),
+            'vc_management_ip': ('django.db.models.fields.CharField', [], {'default': "'1'", 'max_length': '120'}),
+            'vc_password': ('django.db.models.fields.CharField', [], {'max_length': '120'}),
+            'vc_port': ('django.db.models.fields.CharField', [], {'default': "'443'", 'max_length': '5'}),
+            'vc_username': ('django.db.models.fields.CharField', [], {'max_length': '120'}),
+            'vc_version': ('django.db.models.fields.CharField', [], {'max_length': '120', 'null': 'True', 'blank': 'True'})
         }
     }
 
