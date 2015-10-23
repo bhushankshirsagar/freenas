@@ -31,6 +31,9 @@ class Migration(SchemaMigration):
                      default=False)),
              ))
         db.send_create_signal(u'vcp', ['VcenterAuxSettings'])
+        vcpaux = orm.vcenterauxsettings()
+        vcpaux.vc_enable_https = False
+        vcpaux.save()
 
     def backwards(self, orm):
         # Deleting model 'VcenterConfiguration'
